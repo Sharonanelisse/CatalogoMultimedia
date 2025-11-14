@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.smarroquin.catalogomultimedia.enums.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Media_titles {
@@ -12,40 +14,34 @@ public class Media_titles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long media_titles_id;
 
-    @Column(length = 150)
-    @NotNull(message = "El nombre no puede estar en blanco")
-    @Size(min=2,max=150)
+    @NotBlank(message = "Debe ingresar un nombre")
+    @Column(length = 200, nullable = false)
     private String title_name;
 
-    @NotNull(message = "Seleccionar un campo")
+    @NotNull(message = "Debe seleccionar un tipo de producción")
     @Enumerated(EnumType.STRING)
     private title_type title_type;
 
-    @Min(1900)
-    @Max(2100)
     private int release_year;
 
-    @Size(max=1000)
+    @Column(length = 1000)
     private String synopsis;
 
-    @DecimalMin("0.0")
-    @DecimalMax("10.0")
     private double average_rating;
+
+    @Column(nullable = false, updatable = false)
+    private Timestamp created_at;
 
     @PrePersist
     protected void onCreate() {
         this.created_at = new Timestamp(System.currentTimeMillis());
     }
 
-    private Timestamp created_at;
+    /* --------- Relación con archivos --------- */
+    @OneToMany(mappedBy = "media_titles", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Media_files> mediaFiles = new HashSet<>();
 
-    public Timestamp getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Timestamp created_at) {
-        this.created_at = created_at;
-    }
+    /* --------- Getters y Setters --------- */
 
     public Long getMedia_titles_id() {
         return media_titles_id;
@@ -95,18 +91,34 @@ public class Media_titles {
         this.average_rating = average_rating;
     }
 
+    public Timestamp getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(Timestamp created_at) {
+        this.created_at = created_at;
+    }
+
+    public Set<Media_files> getMediaFiles() {
+        return mediaFiles;
+    }
+
+    public void setMediaFiles(Set<Media_files> mediaFiles) {
+        this.mediaFiles = mediaFiles;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("media_titles{");
+        final StringBuffer sb = new StringBuffer("Media_titles{");
         sb.append("media_titles_id=").append(media_titles_id);
-        sb.append(", media_titles_id='").append(media_titles_id).append('\'');
-        sb.append(", title_type='").append(title_type).append('\'');
-        sb.append("release_year=").append(release_year).append('\'');
+        sb.append(", title_name='").append(title_name).append('\'');
+        sb.append(", title_type=").append(title_type);
+        sb.append(", release_year=").append(release_year);
         sb.append(", synopsis='").append(synopsis).append('\'');
-        sb.append(", average_rating='").append(average_rating).append('\'');
+        sb.append(", average_rating=").append(average_rating);
         sb.append(", created_at=").append(created_at);
         sb.append('}');
         return sb.toString();
     }
-
 }
+

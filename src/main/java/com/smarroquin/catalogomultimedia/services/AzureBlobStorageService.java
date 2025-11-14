@@ -1,4 +1,4 @@
-package com.darwinruiz.multistreaming.services;
+package com.smarroquin.catalogomultimedia.services;
 
 
 import com.azure.core.http.rest.PagedIterable;
@@ -8,14 +8,13 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.*;
-import com.azure.storage.blob.options.BlobParallelUploadOptions;
 import com.azure.storage.blob.options.BlockBlobSimpleUploadOptions;
 import com.azure.storage.blob.sas.BlobSasPermission;
 import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import com.azure.storage.common.sas.*;
-import com.darwinruiz.multistreaming.dtos.MediaFileDTO;
-import com.darwinruiz.multistreaming.enums.FileType;
+import com.smarroquin.catalogomultimedia.dtos.MediaFileDTO;
+import com.smarroquin.catalogomultimedia.enums.file_type;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -61,7 +60,7 @@ public class AzureBlobStorageService {
      * Sube un archivo al contenedor según la estructura:
      * posters/{title_name}/{timestamp}.jpg o fichas/{title_name}/{timestamp}.pdf
      */
-    public MediaFileDTO uploadCatalogFile(FileType fileType,
+    public MediaFileDTO uploadCatalogFile(file_type file_type,
                                           String titleName,
                                           String originalFileName,
                                           String contentType,
@@ -73,7 +72,7 @@ public class AzureBlobStorageService {
 
 
         String safeTitle = slug(titleName);
-        String ext = guessExtension(originalFileName, contentType, fileType);
+        String ext = guessExtension(originalFileName, contentType, file_type);
 
         // Fallback de content-type si viene vacío
         if (contentType == null || contentType.isBlank() || "application/octet-stream".equalsIgnoreCase(contentType)) {
@@ -85,14 +84,14 @@ public class AzureBlobStorageService {
             };
         }
 
-        String blobPath = buildPath(fileType, safeTitle, ext);
+        String blobPath = buildPath(file_type, safeTitle, ext);
         BlockBlobClient blob = container.getBlobClient(blobPath).getBlockBlobClient();
 
         BlobHttpHeaders headers = new BlobHttpHeaders().setContentType(contentType);
 
         Map<String, String> metadata = new HashMap<>();
         metadata.put("uploadedBy", uploadedBy != null ? uploadedBy : "unknown");
-        metadata.put("fileType", fileType.name());
+        metadata.put("fileType", file_type.name());
         metadata.put("titleName", safeTitle);
 
 
@@ -122,11 +121,11 @@ public class AzureBlobStorageService {
         dto.setPublicUrl(blob.getBlobUrl());
         dto.setSignedUrl(BlobSasUrl);
         dto.setEtag(props.getETag());
-        dto.setContentType(props.getContentType());
-        dto.setSizeBytes(props.getBlobSize());
-        dto.setFileType(fileType);
-        dto.setUploadedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        dto.setUploadedBy(uploadedBy);
+        dto.setContent_type(props.getContentType());
+        dto.setSize_bytes(props.getBlobSize());
+        dto.setFile_type(file_type);
+        dto.setUploaded_at(OffsetDateTime.now(ZoneOffset.UTC));
+        dto.setUploaded_by(uploadedBy);
 
         return dto;
     }
@@ -140,14 +139,14 @@ public class AzureBlobStorageService {
 
         BlobProperties props = blob.getProperties();
         MediaFileDTO dto = new MediaFileDTO();
-        dto.setBlobUrl(blob.getBlobUrl());
+        dto.setBlob_url(blob.getBlobUrl());
         dto.setBlobName(blobName);
         dto.setEtag(props.getETag());
-        dto.setContentType(props.getContentType());
-        dto.setSizeBytes(props.getBlobSize());
-        dto.setUploadedAt(props.getLastModified());
-        dto.setUploadedBy(getMeta(props.getMetadata(), "uploadedBy"));
-        dto.setFileType(fileTypeFromMetaOr(inferTypeByPath(blobName), props.getMetadata()));
+        dto.setContent_type(props.getContentType());
+        dto.setSize_bytes(props.getBlobSize());
+        dto.setUploaded_at(props.getLastModified());
+        dto.setUploaded_by(getMeta(props.getMetadata(), "uploadedBy"));
+        dto.setFile_type(fileTypeFromMetaOr(inferTypeByPath(blobName), props.getMetadata()));
 
         return Optional.of(dto);
     }
@@ -168,14 +167,14 @@ public class AzureBlobStorageService {
             if (props == null) continue;
 
             MediaFileDTO dto = new MediaFileDTO();
-            dto.setBlobUrl(blob.getBlobUrl());
+            dto.setBlob_url(blob.getBlobUrl());
             dto.setBlobName(name);
             dto.setEtag(props.getETag());
-            dto.setContentType(props.getContentType());
-            dto.setSizeBytes(props.getBlobSize());
-            dto.setUploadedAt(props.getLastModified());
-            dto.setUploadedBy(getMeta(props.getMetadata(), "uploadedBy"));
-            dto.setFileType(fileTypeFromMetaOr(inferTypeByPath(name), props.getMetadata()));
+            dto.setContent_type(props.getContentType());
+            dto.setSize_bytes(props.getBlobSize());
+            dto.setUploaded_at(props.getLastModified());
+            dto.setUploaded_by(getMeta(props.getMetadata(), "uploadedBy"));
+            dto.setFile_type(fileTypeFromMetaOr(inferTypeByPath(name), props.getMetadata()));
             result.add(dto);
         }
         return result;
@@ -220,18 +219,18 @@ public class AzureBlobStorageService {
                 .replaceAll("^_+|_+$", "");
     }
 
-    private static String guessExtension(String fileName, String contentType, FileType type) {
+    private static String guessExtension(String fileName, String contentType, file_type type) {
         if (fileName != null && fileName.contains(".")) {
             return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
         }
         if ("application/pdf".equalsIgnoreCase(contentType)) return "pdf";
         if ("image/png".equalsIgnoreCase(contentType)) return "png";
         if ("image/jpeg".equalsIgnoreCase(contentType)) return "jpg";
-        return (type == FileType.TECHNICAL_SHEET) ? "pdf" : "jpg";
+        return (type == file_type.TECHNICAL_SHEET) ? "pdf" : "jpg";
     }
 
-    private static String buildPath(FileType type, String safeTitle, String ext) {
-        String folder = (type == FileType.POSTER) ? "posters" : "fichas";
+    private static String buildPath(file_type type, String safeTitle, String ext) {
+        String folder = (type == file_type.POSTER) ? "posters" : "fichas";
         long ts = System.currentTimeMillis();
         return String.format("%s/%s/%d.%s", folder, safeTitle, ts, ext);
     }
@@ -240,19 +239,19 @@ public class AzureBlobStorageService {
         return (meta != null && meta.containsKey(key)) ? meta.get(key) : null;
     }
 
-    private static FileType fileTypeFromMetaOr(FileType fallback, Map<String, String> meta) {
+    private static file_type fileTypeFromMetaOr(file_type fallback, Map<String, String> meta) {
         if (meta != null && meta.containsKey("fileType")) {
             try {
-                return FileType.valueOf(meta.get("fileType"));
+                return file_type.valueOf(meta.get("fileType"));
             } catch (Exception ignored) {
             }
         }
         return fallback;
     }
 
-    private static FileType inferTypeByPath(String blobName) {
-        if (blobName.startsWith("posters/")) return FileType.POSTER;
-        if (blobName.startsWith("fichas/")) return FileType.TECHNICAL_SHEET;
+    private static file_type inferTypeByPath(String blobName) {
+        if (blobName.startsWith("posters/")) return file_type.POSTER;
+        if (blobName.startsWith("fichas/")) return file_type.TECHNICAL_SHEET;
         return null;
     }
 

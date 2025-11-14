@@ -1,0 +1,94 @@
+<ui:composition template="/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:define name="content">
+
+        <h:form id="frmMediaFile">
+
+            <h1 class="mb-3">Archivos Multimedia</h1>
+
+            <p:commandButton value="Nuevo Archivo"
+                             icon="pi pi-plus"
+                             styleClass="mb-3 p-button-success"
+                             update=":dlgFile"
+                             action="#{media_filesBean.nuevo()}"
+                             oncomplete="PF('dlgFileWidget').show()"/>
+
+
+            <p:dataTable value="#{media_filesBean.list}"
+                         var="f"
+                         paginator="true"
+                         rows="10"
+                         styleClass="shadow-2">
+
+                <p:column headerText="ID">
+                    #{f.media_files_id}
+                </p:column>
+
+                <p:column headerText="Archivo">
+                    #{f.file_type}
+                </p:column>
+
+                <p:column headerText="URL">
+                    <a href="#{f.url}" target="_blank">Ver</a>
+                </p:column>
+
+                <p:column headerText="Tamaño">
+                    #{f.size_bytes} bytes
+                </p:column>
+
+                <p:column headerText="Acciones">
+                    <p:commandButton icon="pi pi-pencil"
+                                     update=":dlgFile"
+                                     action="#{media_filesBean.editar(f)}"
+                                     oncomplete="PF('dlgFileWidget').show()"/>
+
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger ml-2"
+                                     action="#{media_filesBean.eliminar(f)}"
+                                     update="@form :global"/>
+                </p:column>
+
+            </p:dataTable>
+
+
+            <p:dialog id="dlgFile" widgetVar="dlgFileWidget"
+                      header="Archivo Multimedia"
+                      modal="true"
+                      resizable="false"
+                      styleClass="dialog-nice">
+
+                <h:panelGrid columns="2" cellpadding="5">
+
+                    <h:outputLabel value="Tipo:"/>
+                    <p:inputText value="#{media_filesBean.selected.file_type}"/>
+
+                    <h:outputLabel value="URL:"/>
+                    <p:inputText value="#{media_filesBean.selected.url}"/>
+
+                    <h:outputLabel value="Tamaño:"/>
+                    <p:inputNumber value="#{media_filesBean.selected.size_bytes}"/>
+
+                </h:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar"
+                                 icon="pi pi-check"
+                                 update="@form :global"
+                                 action="#{media_filesBean.guardar()}"/>
+
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 styleClass="p-button-secondary ml-2"
+                                 onclick="PF('dlgFileWidget').hide()"/>
+
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

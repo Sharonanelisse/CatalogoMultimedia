@@ -25,6 +25,10 @@ public class Media_files {
     @Column(length = 500)
     private String blob_url;
 
+    @NotNull(message = "Debe haber un nombre asociado a la URL")
+    @Column(length = 500)
+    private String blobName;
+
     @Column(length = 100)
     private String etag;
 
@@ -34,9 +38,6 @@ public class Media_files {
 
     @NotNull(message = "Debe especificar el tamaño del archivo")
     private Long size_bytes;
-
-    @Column(nullable = false)
-    private boolean active = true;
 
     @PrePersist
     protected void onCreate() {
@@ -57,20 +58,22 @@ public class Media_files {
         };
     }
 
-    public Timestamp getUploaded_at() {
-        return uploaded_at;
+    //Getters and Setters
+
+    public String getBlobName() {
+        return blobName;
     }
 
-    public void setUploaded_at(Timestamp uploaded_at) {
-        this.uploaded_at = uploaded_at;
+    public void setBlobName(String blobName) {
+        this.blobName = blobName;
     }
 
-    public Long getMedia_titles_id() {
+    public Long getMedia_files_id() {
         return media_files_id;
     }
 
-    public void setMedia_titles_id(Long media_titles_id) {
-        this.media_files_id = media_titles_id;
+    public void setMedia_files_id(Long media_files_id) {
+        this.media_files_id = media_files_id;
     }
 
     public Media_titles getMedia_titles() {
@@ -119,6 +122,14 @@ public class Media_files {
 
     public void setSize_bytes(Long size_bytes) {
         this.size_bytes = size_bytes;
+    }
+
+    public Timestamp getUploaded_at() {
+        return uploaded_at;
+    }
+
+    public void setUploaded_at(Timestamp uploaded_at) {
+        this.uploaded_at = uploaded_at;
     }
 
     public String getUploaded_by() {

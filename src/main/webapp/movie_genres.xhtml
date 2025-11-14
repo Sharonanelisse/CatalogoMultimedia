@@ -1,0 +1,82 @@
+<ui:composition template="/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:define name="content">
+
+        <h:form id="frmMovieGenres">
+
+            <h1 class="mb-3">Géneros</h1>
+
+            <p:commandButton value="Nuevo Género"
+                             icon="pi pi-plus"
+                             styleClass="mb-3 p-button-success"
+                             update=":dlgGenre"
+                             action="#{movie_genresBean.nuevo()}"
+                             oncomplete="PF('dlgGenreWidget').show()"/>
+
+
+            <!-- Tabla -->
+            <p:dataTable value="#{movie_genresBean.list}"
+                         var="g"
+                         paginator="true"
+                         rows="10"
+                         styleClass="shadow-2">
+
+                <p:column headerText="ID" style="width:80px;">
+                    #{g.movie_genre_id}
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    #{g.genre_name}
+                </p:column>
+
+                <p:column headerText="Acciones" style="width:150px;">
+                    <p:commandButton icon="pi pi-pencil"
+                                     update=":dlgGenre"
+                                     action="#{movie_genresBean.editar(g)}"
+                                     oncomplete="PF('dlgGenreWidget').show()"/>
+
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger ml-2"
+                                     action="#{movie_genresBean.eliminar(g)}"
+                                     update="@form :global"/>
+                </p:column>
+
+            </p:dataTable>
+
+
+            <!-- Diálogo CRUD -->
+            <p:dialog id="dlgGenre" widgetVar="dlgGenreWidget"
+                      header="Género"
+                      modal="true"
+                      resizable="false"
+                      styleClass="dialog-nice">
+
+                <h:panelGrid columns="2" cellpadding="5">
+
+                    <h:outputLabel value="Nombre:"/>
+                    <p:inputText value="#{movie_genresBean.selected.genre_name}"/>
+
+                </h:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar"
+                                 icon="pi pi-check"
+                                 update="@form :global"
+                                 action="#{movie_genresBean.guardar()}"/>
+
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 styleClass="p-button-secondary ml-2"
+                                 onclick="PF('dlgGenreWidget').hide()"/>
+
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

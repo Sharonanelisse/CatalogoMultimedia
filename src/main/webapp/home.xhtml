@@ -1,39 +1,25 @@
 <ui:composition template="/templates/layout.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <ui:define name="content">
-        <h:form>
-            <div class="p-d-flex p-jc-center p-ai-center p-mb-4">
-                <p:card styleClass="welcome-card">
-                    <f:facet name="title">
-                        <i class="pi pi-star-fill"></i> Odontológica Sonrisa Sana
-                    </f:facet>
-                </p:card>
-            </div>
-        </h:form>
 
-        <h:outputStylesheet>
-            .welcome-card {
-                text-align: center;
-                font-size: 1.5rem;
-                padding: 1.5rem;
-                background: linear-gradient(135deg, #e3f2fd, #fce4ec);
-                color: #3f51b5;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
+        <h1 class="mb-3" style="font-weight:600;">Dashboard • Motor Plus</h1>
 
-            .welcome-card .pi {
-                font-size: 1.2rem;
-                margin-right: 0.5rem;
-                color: #ff4081;
-            }
-        </h:outputStylesheet>
+        <p:panel header="Bienvenido" styleClass="shadow-2 border-round surface-card p-4">
+            <p>Este es el panel principal de Motor Plus. Desde aquí puedes gestionar:</p>
+
+            <ul>
+                <li>Películas y Series</li>
+                <li>Géneros</li>
+                <li>Archivos Multimedia (posters, technical sheets)</li>
+                <li>Asociación Título–Género</li>
+            </ul>
+
+            <p>Usa el menú superior para navegar entre las secciones.</p>
+        </p:panel>
 
     </ui:define>
-
 </ui:composition>

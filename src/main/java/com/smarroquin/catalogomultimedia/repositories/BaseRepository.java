@@ -1,5 +1,6 @@
 package com.smarroquin.catalogomultimedia.repositories;
 
+import com.smarroquin.catalogomultimedia.models.Media_titles_genres;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -54,6 +55,10 @@ public abstract class BaseRepository<T, ID> {
         tx(entityManager -> entityManager.remove(
                 entityManager.contains(e) ? e : entityManager.merge(e)
         ));
+    }
+
+    public Media_titles_genres findByTitleIdAndGenreId(Long titleId, Long genreId) {
+        return null;
     }
 
 }

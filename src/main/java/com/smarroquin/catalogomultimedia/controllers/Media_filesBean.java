@@ -2,7 +2,7 @@ package com.smarroquin.catalogomultimedia.controllers;
 
 
 import com.smarroquin.catalogomultimedia.models.Media_files;
-import com.smarroquin.catalogomultimedia.services.mediaFilesService;
+import com.smarroquin.catalogomultimedia.services.Media_filesService;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -18,11 +18,10 @@ import java.util.*;
 
 @Named
 @ViewScoped
-
-public class mediaFilesBean implements Serializable {
+public class Media_filesBean implements Serializable {
 
     @Inject
-    mediaFilesService service;
+    Media_filesService service;
 
     @Inject
     private Validator validator;
@@ -94,14 +93,14 @@ public class mediaFilesBean implements Serializable {
 
     private String getFieldLabel(String fieldName) {
         Map<String, String> labels = new HashMap<>();
-        labels.put("media_file", "Archivo Multimedia");
-        labels.put("file_type", "Tipo de archivo Multimedia");
-        labels.put("url", "URL");
+        labels.put("media_title_id", "Título al que pertenece el archivo.");
+        labels.put("file_type", "Tipo de archivo almacenado.");
+        labels.put("url", "URL del archivo en Azure Blob Storage.");
         labels.put("etag", "Identificador de versión del blob");
         labels.put("content_type", "Tipo de contenido del archivo");
         labels.put("size_bytes", "Tamaño del archivo");
         labels.put("uploaded_at", "Fecha de subida del archivo");
-        labels.put("uploaded_by", "Usuario que subio el archivo");
+        labels.put("uploaded_by", "Usuario que subio eßl archivo");
 
         return labels.getOrDefault(fieldName, fieldName);
     }

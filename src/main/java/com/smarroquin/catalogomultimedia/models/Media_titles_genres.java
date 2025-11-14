@@ -53,7 +53,7 @@ public class Media_titles_genres {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("media_titles{");
+        final StringBuffer sb = new StringBuffer("media_titles_genres{");
         sb.append("media_titles_genres_id=").append(media_titles_genres_id);
         sb.append(", media_titles='").append(media_titles).append('\'');
         sb.append(", movie_genres='").append(movie_genres);

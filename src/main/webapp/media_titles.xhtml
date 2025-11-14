@@ -1,0 +1,111 @@
+<ui:composition template="/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:define name="content">
+
+        <h:form id="frmMediaTitle">
+
+            <h1 class="mb-3">Películas y Series</h1>
+
+            <p:commandButton value="Nuevo Título"
+                             icon="pi pi-plus"
+                             styleClass="mb-3 p-button-success"
+                             update=":dlgTitle"
+                             action="#{media_titlesBean.nuevo()}"
+                             oncomplete="PF('dlgTitleWidget').show()"/>
+
+            <p:dataTable value="#{media_titlesBean.list}"
+                         var="t"
+                         paginator="true"
+                         rows="10"
+                         styleClass="shadow-2">
+
+                <p:column headerText="ID" style="width:80px;">
+                    #{t.media_titles_id}
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    #{t.title_name}
+                </p:column>
+
+                <p:column headerText="Tipo">
+                    #{t.title_type}
+                </p:column>
+
+                <p:column headerText="Año">
+                    #{t.release_year}
+                </p:column>
+
+                <p:column headerText="Calificación">
+                    #{t.average_rating}
+                </p:column>
+
+                <p:column headerText="Acciones" style="width:150px;">
+                    <p:commandButton icon="pi pi-pencil"
+                                     update=":dlgTitle"
+                                     action="#{media_titlesBean.editar(t)}"
+                                     oncomplete="PF('dlgTitleWidget').show()"/>
+
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger ml-2"
+                                     action="#{media_titlesBean.eliminar(t)}"
+                                     update="@form :global"/>
+                </p:column>
+
+            </p:dataTable>
+
+            <!-- DIALOG -->
+            <p:dialog id="dlgTitle"
+                      widgetVar="dlgTitleWidget"
+                      header="Título"
+                      modal="true"
+                      resizable="false"
+                      styleClass="dialog-nice">
+
+                <h:panelGrid columns="2" cellpadding="5">
+
+                    <h:outputLabel value="Nombre:"/>
+                    <p:inputText value="#{media_titlesBean.selected.title_name}"/>
+
+                    <h:outputLabel value="Tipo:"/>
+                    <p:selectOneMenu value="#{media_titlesBean.selected.title_type}">
+                        <f:selectItem itemValue="MOVIE" itemLabel="Película"/>
+                        <f:selectItem itemValue="SERIE" itemLabel="Serie"/>
+                    </p:selectOneMenu>
+
+                    <h:outputLabel value="Año lanzamiento:"/>
+                    <p:inputNumber value="#{media_titlesBean.selected.release_year}"
+                                   minValue="1900" maxValue="2100"/>
+
+                    <h:outputLabel value="Calificación:"/>
+                    <p:inputNumber value="#{media_titlesBean.selected.average_rating}"
+                                   minValue="0" maxValue="10" decimalPlaces="1"/>
+
+                    <h:outputLabel value="Sinopsis:" style="vertical-align:top"/>
+                    <p:inputTextarea rows="4"
+                                     value="#{media_titlesBean.selected.synopsis}"/>
+
+                </h:panelGrid>
+
+                <p:separator/>
+
+                <p:commandButton value="Guardar"
+                                 icon="pi pi-check"
+                                 update="@form :global"
+                                 action="#{media_titlesBean.guardar()}"/>
+
+                <p:commandButton value="Cancelar"
+                                 icon="pi pi-times"
+                                 styleClass="p-button-secondary ml-2"
+                                 onclick="PF('dlgTitleWidget').hide()"/>
+
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

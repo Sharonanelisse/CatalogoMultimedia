@@ -1,29 +1,29 @@
-package com.darwinruiz.multistreaming.dtos;
+package com.smarroquin.catalogomultimedia.dtos;
 
-import com.darwinruiz.multistreaming.enums.*;
+import com.smarroquin.catalogomultimedia.enums.*;
 
 import java.time.OffsetDateTime;
 
 public class MediaFileDTO {
-    private String blobUrl;
+    private String blob_url;
     private String blobName;
     private String etag;
-    private String contentType;
-    private Long sizeBytes;
-    private FileType fileType;
-    private OffsetDateTime uploadedAt;
-    private String uploadedBy;
+    private String content_type;
+    private Long size_bytes;
+    private file_type file_type;
+    private OffsetDateTime uploaded_at;
+    private String uploaded_by;
 
     private String signedUrl;
     private String publicUrl;
 
     // Getters/Setters
-    public String getBlobUrl() {
-        return blobUrl;
+    public String getBlob_url() {
+        return blob_url;
     }
 
-    public void setBlobUrl(String blobUrl) {
-        this.blobUrl = blobUrl;
+    public void setBlob_url(String blob_url) {
+        this.blob_url = blob_url;
     }
 
     public String getBlobName() {
@@ -42,44 +42,44 @@ public class MediaFileDTO {
         this.etag = etag;
     }
 
-    public String getContentType() {
-        return contentType;
+    public String getContent_type() {
+        return content_type;
     }
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
+    public void setContent_type(String content_type) {
+        this.content_type = content_type;
     }
 
-    public Long getSizeBytes() {
-        return sizeBytes;
+    public Long getSize_bytes() {
+        return size_bytes;
     }
 
-    public void setSizeBytes(Long sizeBytes) {
-        this.sizeBytes = sizeBytes;
+    public void setSize_bytes(Long size_bytes) {
+        this.size_bytes = size_bytes;
     }
 
-    public FileType getFileType() {
-        return fileType;
+    public file_type getFile_type() {
+        return file_type;
     }
 
-    public void setFileType(FileType fileType) {
-        this.fileType = fileType;
+    public void setFile_type(file_type file_type) {
+        this.file_type = file_type;
     }
 
-    public OffsetDateTime getUploadedAt() {
-        return uploadedAt;
+    public OffsetDateTime getUploaded_at() {
+        return uploaded_at;
     }
 
-    public void setUploadedAt(OffsetDateTime uploadedAt) {
-        this.uploadedAt = uploadedAt;
+    public void setUploaded_at(OffsetDateTime uploaded_at) {
+        this.uploaded_at = uploaded_at;
     }
 
-    public String getUploadedBy() {
-        return uploadedBy;
+    public String getUploaded_by() {
+        return uploaded_by;
     }
 
-    public void setUploadedBy(String uploadedBy) {
-        this.uploadedBy = uploadedBy;
+    public void setUploaded_by(String uploaded_by) {
+        this.uploaded_by = uploaded_by;
     }
 
     public String getSignedUrl() {

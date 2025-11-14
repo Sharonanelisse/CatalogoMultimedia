@@ -1,7 +1,7 @@
 package com.smarroquin.catalogomultimedia.controllers;
 
-import com.smarroquin.catalogomultimedia.models.Media_titles;
-import com.smarroquin.catalogomultimedia.services.mediaTitlesService;
+import com.smarroquin.catalogomultimedia.models.*;
+import com.smarroquin.catalogomultimedia.services.*;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -17,47 +17,46 @@ import java.util.*;
 
 @Named
 @ViewScoped
-public class mediaTitlesBean implements Serializable {
-
+public class Movie_genresBean implements Serializable {
     @Inject
-    mediaTitlesService MTservice;
+    Movie_genresService MGservice;
 
     @Inject
     private Validator validator;
 
-    private Media_titles MTselected;
+    private Movie_genres MGselected;
     private boolean dialogVisible;
 
     @PostConstruct
     public void init() {
-        MTselected = new Media_titles();
+        MGselected = new Movie_genres();
         dialogVisible = false;
     }
 
-    public List<Media_titles> getList(){ return MTservice.media_titles();}
+    public List<Movie_genres> getList(){ return MGservice.movie_genres();}
 
     public void nuevo() {
         clearFacesMessages();
-        MTselected = new Media_titles();
+        MGselected = new Movie_genres();
         dialogVisible = true;
     }
 
-    public void editar(Media_titles mt) {
+    public void editar(Movie_genres mf) {
         clearFacesMessages();
-        this.MTselected = mt;
+        this.MGselected = mf;
         dialogVisible = true;
     }
 
     public void guardar() {
-        Set<ConstraintViolation<Media_titles>> violations = validator.validate(MTselected);
+        Set<ConstraintViolation<Movie_genres>> violations = validator.validate(MGselected);
 
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<Media_titles> violation : violations) {
+            for (ConstraintViolation<Movie_genres> violation : violations) {
                 String field = violation.getPropertyPath().toString();
                 String message = violation.getMessage();
                 String label = getFieldLabel(field);
 
-                FacesContext.getCurrentInstance().addMessage("frmMediaFile:frmMediaFile",
+                FacesContext.getCurrentInstance().addMessage("frmMovieGenres:frmMovieGenres",
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 label + ": " + message, null));
             }
@@ -67,17 +66,17 @@ public class mediaTitlesBean implements Serializable {
         }
 
 
-        MTservice.guardar(MTselected);
+        MGservice.guardar(MGselected);
         dialogVisible = false;
         FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Archivo guardado", "Operación exitosa"));
-        MTselected = new Media_titles();
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Genero guardado", "Operación exitosa"));
+        MGselected = new Movie_genres();
     }
 
-    public void eliminar(Media_titles mt) {
-        MTservice.eliminar(mt);
+    public void eliminar(Movie_genres mf) {
+        MGservice.eliminar(mf);
         FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Archivo eliminado", null));
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Genero eliminado", null));
     }
 
 
@@ -92,29 +91,23 @@ public class mediaTitlesBean implements Serializable {
 
     private String getFieldLabel(String fieldName) {
         Map<String, String> labels = new HashMap<>();
-        labels.put("title_name", "Título de película o serie");
-        labels.put("title_type", "Tipo de entretenimiento");
-        labels.put("release_year", "Año de publicación");
-        labels.put("synopsis", "Sinopsis");
-        labels.put("average_rating", "Calificacion promedio");
-        labels.put("created_at", "Fecha de creacion");
-
+        labels.put("genre_name", "Nombre único del género");
         return labels.getOrDefault(fieldName, fieldName);
     }
 
-    public Media_titles getSelected() {
-        if (MTselected == null) {
-            MTselected = new Media_titles();
+    public Movie_genres getSelected() {
+        if (MGselected == null) {
+            MGselected = new Movie_genres();
         }
-        return MTselected;
+        return MGselected;
     }
 
     public void cancelar() {
-        MTselected = new Media_titles();
+        MGselected = new Movie_genres();
     }
 
-    public void setSelected(Media_titles selected) {
-        this.MTselected = selected;
+    public void setSelected(Movie_genres MGselected) {
+        this.MGselected = MGselected;
     }
 
     public boolean isDialogVisible() {
@@ -124,7 +117,5 @@ public class mediaTitlesBean implements Serializable {
     public void setDialogVisible(boolean dialogVisible) {
         this.dialogVisible = dialogVisible;
     }
-    
-    
-    
+
 }
