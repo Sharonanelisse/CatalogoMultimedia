@@ -1,8 +1,7 @@
 package com.smarroquin.catalogomultimedia.controllers;
 
-
-import com.smarroquin.catalogomultimedia.models.Media_files;
-import com.smarroquin.catalogomultimedia.services.mediaFilesService;
+import com.smarroquin.catalogomultimedia.models.Media_titles;
+import com.smarroquin.catalogomultimedia.services.mediaTitlesService;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -18,43 +17,42 @@ import java.util.*;
 
 @Named
 @ViewScoped
-
-public class mediaFilesBean implements Serializable {
+public class mediaTitlesBean implements Serializable {
 
     @Inject
-    mediaFilesService service;
+    mediaTitlesService MTservice;
 
     @Inject
     private Validator validator;
 
-    private Media_files selected;
+    private Media_titles MTselected;
     private boolean dialogVisible;
 
     @PostConstruct
     public void init() {
-        selected = new Media_files();
+        MTselected = new Media_titles();
         dialogVisible = false;
     }
 
-    public List<Media_files> getList(){ return service.media_files();}
+    public List<Media_titles> getList(){ return MTservice.media_titles();}
 
     public void nuevo() {
         clearFacesMessages();
-        selected = new Media_files();
+        MTselected = new Media_titles();
         dialogVisible = true;
     }
 
-    public void editar(Media_files mf) {
+    public void editar(Media_titles mt) {
         clearFacesMessages();
-        this.selected = mf;
+        this.MTselected = mt;
         dialogVisible = true;
     }
 
     public void guardar() {
-        Set<ConstraintViolation<Media_files>> violations = validator.validate(selected);
+        Set<ConstraintViolation<Media_titles>> violations = validator.validate(MTselected);
 
         if (!violations.isEmpty()) {
-            for (ConstraintViolation<Media_files> violation : violations) {
+            for (ConstraintViolation<Media_titles> violation : violations) {
                 String field = violation.getPropertyPath().toString();
                 String message = violation.getMessage();
                 String label = getFieldLabel(field);
@@ -69,15 +67,15 @@ public class mediaFilesBean implements Serializable {
         }
 
 
-        service.guardar(selected);
+        MTservice.guardar(MTselected);
         dialogVisible = false;
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Archivo guardado", "Operación exitosa"));
-        selected = new Media_files();
+        MTselected = new Media_titles();
     }
 
-    public void eliminar(Media_files mf) {
-        service.eliminar(mf);
+    public void eliminar(Media_titles mt) {
+        MTservice.eliminar(mt);
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Archivo eliminado", null));
     }
@@ -94,31 +92,29 @@ public class mediaFilesBean implements Serializable {
 
     private String getFieldLabel(String fieldName) {
         Map<String, String> labels = new HashMap<>();
-        labels.put("media_file", "Archivo Multimedia");
-        labels.put("file_type", "Tipo de archivo Multimedia");
-        labels.put("url", "URL");
-        labels.put("etag", "Identificador de versión del blob");
-        labels.put("content_type", "Tipo de contenido del archivo");
-        labels.put("size_bytes", "Tamaño del archivo");
-        labels.put("uploaded_at", "Fecha de subida del archivo");
-        labels.put("uploaded_by", "Usuario que subio el archivo");
+        labels.put("title_name", "Título de película o serie");
+        labels.put("title_type", "Tipo de entretenimiento");
+        labels.put("release_year", "Año de publicación");
+        labels.put("synopsis", "Sinopsis");
+        labels.put("average_rating", "Calificacion promedio");
+        labels.put("created_at", "Fecha de creacion");
 
         return labels.getOrDefault(fieldName, fieldName);
     }
 
-    public Media_files getSelected() {
-        if (selected == null) {
-            selected = new Media_files();
+    public Media_titles getSelected() {
+        if (MTselected == null) {
+            MTselected = new Media_titles();
         }
-        return selected;
+        return MTselected;
     }
 
     public void cancelar() {
-        selected = new Media_files();
+        MTselected = new Media_titles();
     }
 
-    public void setSelected(Media_files selected) {
-        this.selected = selected;
+    public void setSelected(Media_titles selected) {
+        this.MTselected = selected;
     }
 
     public boolean isDialogVisible() {
@@ -128,5 +124,7 @@ public class mediaFilesBean implements Serializable {
     public void setDialogVisible(boolean dialogVisible) {
         this.dialogVisible = dialogVisible;
     }
-
+    
+    
+    
 }

@@ -6,7 +6,7 @@ import com.smarroquin.catalogomultimedia.enums.*;
 import java.sql.Timestamp;
 
 @Entity
-public class media_titles {
+public class Media_titles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

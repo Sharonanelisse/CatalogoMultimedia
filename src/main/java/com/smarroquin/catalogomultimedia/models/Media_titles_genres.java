@@ -11,7 +11,7 @@ import jakarta.validation.constraints.*;
                 @UniqueConstraint(columnNames = {"media_title_id", "movie_genre_id"})
         }
 )
-public class media_titles_genres {
+public class Media_titles_genres {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +20,12 @@ public class media_titles_genres {
     @NotNull(message = "Debe asociarse a un título")
     @ManyToOne(optional = false)
     @JoinColumn(name = "media_title_id", nullable = false)
-    private media_titles media_titles;
+    private Media_titles media_titles;
 
     @NotNull(message = "Debe asociarse a un título")
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_genre_id", nullable = false)
-    private movie_genres movie_genres;
+    private Movie_genres movie_genres;
 
     public Long getMedia_titles_genres_id() {
         return media_titles_genres_id;
@@ -35,19 +35,19 @@ public class media_titles_genres {
         this.media_titles_genres_id = media_titles_genres_id;
     }
 
-    public media_titles getMedia_titles() {
+    public Media_titles getMedia_titles() {
         return media_titles;
     }
 
-    public void setMedia_titles(media_titles media_titles) {
+    public void setMedia_titles(Media_titles media_titles) {
         this.media_titles = media_titles;
     }
 
-    public movie_genres getMovie_genres() {
+    public Movie_genres getMovie_genres() {
         return movie_genres;
     }
 
-    public void setMovie_genres(movie_genres movie_genres) {
+    public void setMovie_genres(Movie_genres movie_genres) {
         this.movie_genres = movie_genres;
     }
 

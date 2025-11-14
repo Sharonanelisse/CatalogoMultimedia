@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 
 
 @Entity
-public class movie_genres {
+public class Movie_genres {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
