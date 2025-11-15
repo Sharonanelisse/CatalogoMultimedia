@@ -116,8 +116,10 @@ public class AzureBlobStorageService {
         String BlobSasUrl = this.buildBlobSasUrl(blob, Duration.ofDays(365), true, blob.getBlobName(), contentType);
 
         // DTO
+        // DTO
         MediaFileDTO dto = new MediaFileDTO();
         dto.setBlobName(blobPath);
+        dto.setBlob_url(blob.getBlobUrl());
         dto.setPublicUrl(blob.getBlobUrl());
         dto.setSignedUrl(BlobSasUrl);
         dto.setEtag(props.getETag());
@@ -128,6 +130,7 @@ public class AzureBlobStorageService {
         dto.setUploaded_by(uploadedBy);
 
         return dto;
+
     }
 
     /**

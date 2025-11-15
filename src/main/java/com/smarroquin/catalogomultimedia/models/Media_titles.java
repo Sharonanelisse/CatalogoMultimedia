@@ -41,6 +41,7 @@ public class Media_titles {
     @OneToMany(mappedBy = "media_titles", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Media_files> mediaFiles = new HashSet<>();
 
+
     /* --------- Getters y Setters --------- */
 
     public Long getMedia_titles_id() {

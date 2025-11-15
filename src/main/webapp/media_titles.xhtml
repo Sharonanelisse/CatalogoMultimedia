@@ -30,6 +30,23 @@
 
                 <h:outputLabel value="Calificación promedio:" for="average_rating"/>
                 <p:inputText id="average_rating" value="#{mediaTitlesBean.selected.average_rating}"/>
+
+                <!-- Subida de archivos (requisito) -->
+                <h:outputLabel value="Subir archivo:" for="uploadFileType"/>
+                <p:selectOneMenu id="uploadFileType" value="#{mediaTitlesBean.uploadingFileType}" required="true">
+                    <f:selectItems value="#{mediaTitlesBean.fileTypes}" var="ft"
+                                   itemLabel="#{ft}" itemValue="#{ft}" />
+                </p:selectOneMenu>
+
+                <h:outputLabel value="" />
+                <p:fileUpload listener="#{mediaTitlesBean.handleFileUpload}"
+                              mode="advanced"
+                              dragDropSupport="true"
+                              update="frmMediaTitle:mediaFilesTable,frmMediaTitle:messages"
+                              auto="true"
+                              sizeLimit="5242880"
+                              allowTypes="/(\.|\/)(pdf|png|jpg|jpeg)$/"
+                              label="Seleccionar archivo"/>
             </h:panelGrid>
 
             <!-- Botones -->
@@ -131,24 +148,9 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-
-            <!-- Subida de archivos -->
-            <h3>Subir archivo</h3>
-            <p:selectOneMenu id="uploadFileType" value="#{mediaTitlesBean.uploadingFileType}" required="true">
-                <f:selectItems value="#{mediaTitlesBean.fileTypes}" var="ft"
-                               itemLabel="#{ft}" itemValue="#{ft}" />
-            </p:selectOneMenu>
-
-            <p:fileUpload listener="#{mediaTitlesBean.handleFileUpload}"
-                          mode="advanced"
-                          dragDropSupport="true"
-                          update="mediaFilesTable,messages"
-                          auto="true"
-                          sizeLimit="5242880"
-                          allowTypes="/(\.|\/)(pdf|png|jpg|jpeg)$/"
-                          label="Seleccionar archivo"/>
         </h:form>
     </ui:define>
 </ui:composition>
+
 
 

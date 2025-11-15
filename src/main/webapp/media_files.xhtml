@@ -19,6 +19,14 @@
                                    itemLabel="#{ft}" itemValue="#{ft}" />
                 </p:selectOneMenu>
 
+                <p:fileUpload listener="#{mediaTitlesBean.handleFileUpload}"
+                              mode="advanced"
+                              update="mediaFilesTable,messages"
+                              auto="true"
+                              sizeLimit="5242880"
+                              allowTypes="/(\.|\/)(pdf|png|jpg|jpeg)$/"
+                              label="Seleccionar archivo"/>
+
 
                 <h:outputLabel value="URL:" for="blob_url"/>
                 <p:inputText id="blob_url" value="#{media_filesBean.selected.blob_url}" required="true"/>

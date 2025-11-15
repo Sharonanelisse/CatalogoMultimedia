@@ -38,18 +38,23 @@ public abstract class BaseRepository<T, ID> {
     }
 
     public T guardar(T e) {
+        final T[] result = (T[]) new Object[1]; // para capturar el resultado dentro del lambda
+
         tx(entityManager -> {
             Object id = entityManager.getEntityManagerFactory()
                     .getPersistenceUnitUtil()
                     .getIdentifier(e);
             if (id == null) {
-                entityManager.persist(e);   // nuevo
+                entityManager.persist(e);
+                result[0] = e;
             } else {
-                entityManager.merge(e);     // existente
+                result[0] = entityManager.merge(e);
             }
         });
-        return e;
+
+        return result[0];
     }
+
 
     public void eliminar(T e) {
         tx(entityManager -> entityManager.remove(

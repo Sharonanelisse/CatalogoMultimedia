@@ -131,14 +131,11 @@ public class Media_titlesBean implements Serializable {
         boolean isNew = MTselected.getMedia_titles_id() == null;
         MTservice.guardar(MTselected);
 
-        FacesMessage msg = new FacesMessage(isNew ?
-                "Título agregado con éxito!" : "Título actualizado con éxito!");
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage("Título guardado con éxito"));
 
-        PrimeFaces.current().executeScript("PF('manageMediaTitlesDialog').hide()");
         PrimeFaces.current().ajax().update("frmMediaTitle:messages", "frmMediaTitle:dtMediaTitles");
 
-        MTselected = new Media_titles();
         dialogVisible = false;
     }
 
@@ -152,14 +149,6 @@ public class Media_titlesBean implements Serializable {
 
     /* --------- File upload / delete --------- */
     public void handleFileUpload(FileUploadEvent event) {
-        // Validar que el tipo de archivo (enum) esté seleccionado
-        if (uploadingFileType == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Debe seleccionar un tipo de archivo antes de subir", null));
-            return;
-        }
-
         UploadedFile uf = event.getFile();
         if (uf == null || uf.getSize() == 0) {
             FacesContext.getCurrentInstance().addMessage(null,
@@ -196,9 +185,11 @@ public class Media_titlesBean implements Serializable {
         }
 
         try (InputStream in = uf.getInputStream()) {
-            // Subir al blob storage
+            // Si no seleccionó tipo, asignar un valor por defecto
+            file_type tipo = (uploadingFileType != null) ? uploadingFileType : file_type.POSTER;
+
             MediaFileDTO dto = azureBlobStorageService.uploadCatalogFile(
-                    uploadingFileType,
+                    tipo,
                     MTselected.getTitle_name(),
                     uf.getFileName(),
                     ct,
@@ -206,10 +197,9 @@ public class Media_titlesBean implements Serializable {
                     size,
                     "ui",
                     Duration.ofMinutes(30),
-                    true // openInline
+                    true
             );
 
-            // Construir entidad Media_files con datos del DTO
             Media_files mf = new Media_files();
             mf.setMedia_titles(MTselected);
             mf.setFile_type(dto.getFile_type());
@@ -224,7 +214,6 @@ public class Media_titlesBean implements Serializable {
                 mf.setUploaded_at(java.sql.Timestamp.valueOf(dto.getUploaded_at().toLocalDateTime()));
             }
 
-            // Asociar al título seleccionado
             MTselected.getMediaFiles().add(mf);
 
             FacesContext.getCurrentInstance().addMessage(null,
@@ -238,7 +227,6 @@ public class Media_titlesBean implements Serializable {
 
         PrimeFaces.current().ajax().update("frmMediaTitle:mediaFilesTable", "frmMediaTitle:messages");
     }
-
 
     public void deleteMediaFile() {
         if (selectedFile == null) return;
