@@ -1,8 +1,6 @@
 package com.smarroquin.catalogomultimedia.controllers;
 
-import com.smarroquin.catalogomultimedia.models.Media_titles;
 import com.smarroquin.catalogomultimedia.models.Media_titles_genres;
-import com.smarroquin.catalogomultimedia.models.Movie_genres;
 import com.smarroquin.catalogomultimedia.services.Media_titles_genresService;
 
 import jakarta.annotation.PostConstruct;

@@ -1,111 +1,154 @@
 <ui:composition template="/templates/layout.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <ui:define name="content">
+        <h1>Gestión de Títulos Multimedia</h1>
 
         <h:form id="frmMediaTitle">
+            <p:growl id="messages" showDetail="true" life="4000" />
 
-            <h1 class="mb-3">Películas y Series</h1>
+            <!-- Datos del título -->
+            <h:panelGrid columns="2" columnClasses="label,value">
+                <h:outputLabel value="Nombre del título:" for="title_name"/>
+                <p:inputText id="title_name" value="#{mediaTitlesBean.selected.title_name}" required="true"/>
 
-            <p:commandButton value="Nuevo Título"
-                             icon="pi pi-plus"
-                             styleClass="mb-3 p-button-success"
-                             update=":dlgTitle"
-                             action="#{media_titlesBean.nuevo()}"
-                             oncomplete="PF('dlgTitleWidget').show()"/>
+                <h:outputLabel value="Tipo de producción:" for="title_type"/>
+                <p:selectOneMenu id="title_type" value="#{mediaTitlesBean.selected.title_type}" required="true">
+                    <f:selectItems value="#{mediaTitlesBean.titleTypes}" var="tt"
+                                   itemLabel="#{tt}" itemValue="#{tt}" />
+                </p:selectOneMenu>
 
-            <p:dataTable value="#{media_titlesBean.list}"
-                         var="t"
+                <h:outputLabel value="Año de lanzamiento:" for="release_year"/>
+                <p:inputText id="release_year" value="#{mediaTitlesBean.selected.release_year}" required="true"/>
+
+                <h:outputLabel value="Sinopsis:" for="synopsis"/>
+                <p:inputTextarea id="synopsis" value="#{mediaTitlesBean.selected.synopsis}" rows="4" cols="40"/>
+
+                <h:outputLabel value="Calificación promedio:" for="average_rating"/>
+                <p:inputText id="average_rating" value="#{mediaTitlesBean.selected.average_rating}"/>
+            </h:panelGrid>
+
+            <!-- Botones -->
+            <p:commandButton value="Guardar"
+                             action="#{mediaTitlesBean.guardar}"
+                             update="frmMediaTitle:dtMediaTitles,frmMediaTitle:messages,frmMediaTitle"
+                             icon="pi pi-check" />
+
+            <p:commandButton value="Cancelar"
+                             action="#{mediaTitlesBean.nuevo}"
+                             update="frmMediaTitle"
+                             icon="pi pi-times"
+                             styleClass="p-button-secondary" />
+
+            <!-- Tabla de títulos -->
+            <p:dataTable id="dtMediaTitles"
+                         value="#{mediaTitlesBean.list}"
+                         var="mt"
                          paginator="true"
                          rows="10"
-                         styleClass="shadow-2">
+                         style="margin-top:20px;"
+                         rowKey="#{mt.media_titles_id}"
+                         selectionMode="single"
+                         selection="#{mediaTitlesBean.selected}">
 
-                <p:column headerText="ID" style="width:80px;">
-                    #{t.media_titles_id}
+                <p:column headerText="ID">
+                    <h:outputText value="#{mt.media_titles_id}" />
                 </p:column>
 
                 <p:column headerText="Nombre">
-                    #{t.title_name}
+                    <h:outputText value="#{mt.title_name}" />
                 </p:column>
 
                 <p:column headerText="Tipo">
-                    #{t.title_type}
+                    <h:outputText value="#{mt.title_type}" />
                 </p:column>
 
                 <p:column headerText="Año">
-                    #{t.release_year}
+                    <h:outputText value="#{mt.release_year}" />
                 </p:column>
 
                 <p:column headerText="Calificación">
-                    #{t.average_rating}
+                    <h:outputText value="#{mt.average_rating}" />
                 </p:column>
 
-                <p:column headerText="Acciones" style="width:150px;">
-                    <p:commandButton icon="pi pi-pencil"
-                                     update=":dlgTitle"
-                                     action="#{media_titlesBean.editar(t)}"
-                                     oncomplete="PF('dlgTitleWidget').show()"/>
+                <p:column headerText="Acciones">
+                    <p:commandButton value="Editar"
+                                     action="#{mediaTitlesBean.editar(mt)}"
+                                     update="frmMediaTitle"
+                                     icon="pi pi-pencil" />
 
-                    <p:commandButton icon="pi pi-trash"
-                                     styleClass="p-button-danger ml-2"
-                                     action="#{media_titlesBean.eliminar(t)}"
-                                     update="@form :global"/>
+                    <p:commandButton value="Eliminar"
+                                     action="#{mediaTitlesBean.eliminar(mt)}"
+                                     update="frmMediaTitle:dtMediaTitles,frmMediaTitle:messages"
+                                     icon="pi pi-trash"
+                                     styleClass="ui-button-danger"
+                                     process="@this" />
                 </p:column>
-
             </p:dataTable>
 
-            <!-- DIALOG -->
-            <p:dialog id="dlgTitle"
-                      widgetVar="dlgTitleWidget"
-                      header="Título"
-                      modal="true"
-                      resizable="false"
-                      styleClass="dialog-nice">
+            <!-- Archivos asociados -->
+            <h3>Archivos asociados</h3>
+            <p:dataTable id="mediaFilesTable"
+                         value="#{mediaTitlesBean.filesOfSelected}"
+                         var="mf"
+                         paginator="true"
+                         rows="5"
+                         style="margin-top:10px;">
 
-                <h:panelGrid columns="2" cellpadding="5">
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{mf.file_type}" />
+                </p:column>
 
-                    <h:outputLabel value="Nombre:"/>
-                    <p:inputText value="#{media_titlesBean.selected.title_name}"/>
+                <p:column headerText="Nombre">
+                    <h:outputText value="#{mf.blobName}" />
+                </p:column>
 
-                    <h:outputLabel value="Tipo:"/>
-                    <p:selectOneMenu value="#{media_titlesBean.selected.title_type}">
-                        <f:selectItem itemValue="MOVIE" itemLabel="Película"/>
-                        <f:selectItem itemValue="SERIE" itemLabel="Serie"/>
-                    </p:selectOneMenu>
+                <p:column headerText="URL">
+                    <h:outputLink value="media_files.xhtml?id=#{mf.media_files_id}" target="_blank">
+                        Ver archivo
+                    </h:outputLink>
+                </p:column>
 
-                    <h:outputLabel value="Año lanzamiento:"/>
-                    <p:inputNumber value="#{media_titlesBean.selected.release_year}"
-                                   minValue="1900" maxValue="2100"/>
+                <p:column headerText="Subido por">
+                    <h:outputText value="#{mf.uploaded_by}" />
+                </p:column>
 
-                    <h:outputLabel value="Calificación:"/>
-                    <p:inputNumber value="#{media_titlesBean.selected.average_rating}"
-                                   minValue="0" maxValue="10" decimalPlaces="1"/>
+                <p:column headerText="Fecha subida">
+                    <h:outputText value="#{mf.uploaded_at}" />
+                </p:column>
 
-                    <h:outputLabel value="Sinopsis:" style="vertical-align:top"/>
-                    <p:inputTextarea rows="4"
-                                     value="#{media_titlesBean.selected.synopsis}"/>
+                <p:column headerText="Acciones">
+                    <p:commandButton value="Eliminar"
+                                     action="#{mediaTitlesBean.deleteMediaFile}"
+                                     update="mediaFilesTable,messages"
+                                     icon="pi pi-trash"
+                                     styleClass="ui-button-danger">
+                        <f:setPropertyActionListener target="#{mediaTitlesBean.selectedFile}" value="#{mf}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
 
-                </h:panelGrid>
+            <!-- Subida de archivos -->
+            <h3>Subir archivo</h3>
+            <p:selectOneMenu id="uploadFileType" value="#{mediaTitlesBean.uploadingFileType}" required="true">
+                <f:selectItems value="#{mediaTitlesBean.fileTypes}" var="ft"
+                               itemLabel="#{ft}" itemValue="#{ft}" />
+            </p:selectOneMenu>
 
-                <p:separator/>
-
-                <p:commandButton value="Guardar"
-                                 icon="pi pi-check"
-                                 update="@form :global"
-                                 action="#{media_titlesBean.guardar()}"/>
-
-                <p:commandButton value="Cancelar"
-                                 icon="pi pi-times"
-                                 styleClass="p-button-secondary ml-2"
-                                 onclick="PF('dlgTitleWidget').hide()"/>
-
-            </p:dialog>
-
+            <p:fileUpload listener="#{mediaTitlesBean.handleFileUpload}"
+                          mode="advanced"
+                          dragDropSupport="true"
+                          update="mediaFilesTable,messages"
+                          auto="true"
+                          sizeLimit="5242880"
+                          allowTypes="/(\.|\/)(pdf|png|jpg|jpeg)$/"
+                          label="Seleccionar archivo"/>
         </h:form>
-
     </ui:define>
 </ui:composition>
+
+

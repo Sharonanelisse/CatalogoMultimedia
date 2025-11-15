@@ -1,94 +1,117 @@
 <ui:composition template="/templates/layout.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <ui:define name="content">
+        <h1>Gestión de Archivos Multimedia</h1>
 
-        <h:form id="frmMediaFile">
+        <h:form id="formMedia">
+            <p:growl id="msgs" showDetail="true" life="4000" />
 
-            <h1 class="mb-3">Archivos Multimedia</h1>
+            <h:panelGrid columns="2" columnClasses="label,value">
 
-            <p:commandButton value="Nuevo Archivo"
-                             icon="pi pi-plus"
-                             styleClass="mb-3 p-button-success"
-                             update=":dlgFile"
-                             action="#{media_filesBean.nuevo()}"
-                             oncomplete="PF('dlgFileWidget').show()"/>
+                <h:outputLabel value="Tipo de archivo:" for="uploadFileType"/>
+                <p:selectOneMenu id="uploadFileType" value="#{mediaTitlesBean.uploadingFileType}" required="true">
+                    <f:selectItems value="#{mediaTitlesBean.fileTypes}" var="ft"
+                                   itemLabel="#{ft}" itemValue="#{ft}" />
+                </p:selectOneMenu>
 
 
-            <p:dataTable value="#{media_filesBean.list}"
-                         var="f"
+                <h:outputLabel value="URL:" for="blob_url"/>
+                <p:inputText id="blob_url" value="#{media_filesBean.selected.blob_url}" required="true"/>
+
+
+                <h:outputLabel value="ETag:" for="etag"/>
+                <p:inputText id="etag" value="#{media_filesBean.selected.etag}"/>
+
+                <h:outputLabel value="Content Type:" for="content_type"/>
+                <p:inputText id="content_type" value="#{media_filesBean.selected.content_type}"/>
+
+                <h:outputLabel value="Tamaño (bytes):" for="size_bytes"/>
+                <p:inputText id="size_bytes" value="#{media_filesBean.selected.size_bytes}"/>
+
+                <h:outputLabel value="Fecha subida:" for="uploaded_at"/>
+                <p:calendar id="uploaded_at" value="#{media_filesBean.selected.uploaded_at}" pattern="dd/MM/yyyy HH:mm"/>
+
+                <h:outputLabel value="Subido por:" for="uploaded_by"/>
+                <p:inputText id="uploaded_by" value="#{media_filesBean.selected.uploaded_by}"/>
+            </h:panelGrid>
+
+            <p:commandButton value="Guardar"
+                             action="#{media_filesBean.guardar}"
+                             update="formMedia:tblMedia,formMedia:msgs"
+                             icon="pi pi-check" />
+
+            <p:commandButton value="Cancelar"
+                             action="#{media_filesBean.cancelar}"
+                             update="formMedia"
+                             icon="pi pi-times"
+                             styleClass="p-button-secondary" />
+
+            <p:dataTable id="tblMedia"
+                         value="#{media_filesBean.list}"
+                         var="mf"
                          paginator="true"
                          rows="10"
-                         styleClass="shadow-2">
+                         style="margin-top:20px;"
+                         rowKey="#{mf.media_files_id}"
+
+                         selectionMode="single"
+                         selection="#{media_filesBean.selected}">
 
                 <p:column headerText="ID">
-                    #{f.media_files_id}
+                    <h:outputText value="#{mf.media_files_id}" />
                 </p:column>
 
-                <p:column headerText="Archivo">
-                    #{f.file_type}
+                <p:column headerText="Título ID">
+                    <h:outputText value="#{mf.media_title_id}" />
+                </p:column>
+
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{mf.file_type}" />
                 </p:column>
 
                 <p:column headerText="URL">
-                    <a href="#{f.url}" target="_blank">Ver</a>
+                    <h:outputText value="#{mf.url}" />
+                </p:column>
+
+                <p:column headerText="ETag">
+                    <h:outputText value="#{mf.etag}" />
+                </p:column>
+
+                <p:column headerText="Content Type">
+                    <h:outputText value="#{mf.content_type}" />
                 </p:column>
 
                 <p:column headerText="Tamaño">
-                    #{f.size_bytes} bytes
+                    <h:outputText value="#{mf.size_bytes}" />
+                </p:column>
+
+                <p:column headerText="Fecha subida">
+                    <h:outputText value="#{mf.uploaded_at}" />
+                </p:column>
+
+                <p:column headerText="Subido por">
+                    <h:outputText value="#{mf.uploaded_by}" />
                 </p:column>
 
                 <p:column headerText="Acciones">
-                    <p:commandButton icon="pi pi-pencil"
-                                     update=":dlgFile"
-                                     action="#{media_filesBean.editar(f)}"
-                                     oncomplete="PF('dlgFileWidget').show()"/>
+                    <p:commandButton value="Editar"
+                                     action="#{media_filesBean.editar(mf)}"
+                                     update="formMedia"
+                                     icon="pi pi-pencil" />
 
-                    <p:commandButton icon="pi pi-trash"
-                                     styleClass="p-button-danger ml-2"
-                                     action="#{media_filesBean.eliminar(f)}"
-                                     update="@form :global"/>
+                    <p:commandButton value="Eliminar"
+                                     action="#{media_filesBean.eliminar(mf)}"
+                                     update="formMedia:tblMedia,formMedia:msgs"
+                                     icon="pi pi-trash"
+                                     styleClass="ui-button-danger" />
+
                 </p:column>
-
             </p:dataTable>
-
-
-            <p:dialog id="dlgFile" widgetVar="dlgFileWidget"
-                      header="Archivo Multimedia"
-                      modal="true"
-                      resizable="false"
-                      styleClass="dialog-nice">
-
-                <h:panelGrid columns="2" cellpadding="5">
-
-                    <h:outputLabel value="Tipo:"/>
-                    <p:inputText value="#{media_filesBean.selected.file_type}"/>
-
-                    <h:outputLabel value="URL:"/>
-                    <p:inputText value="#{media_filesBean.selected.url}"/>
-
-                    <h:outputLabel value="Tamaño:"/>
-                    <p:inputNumber value="#{media_filesBean.selected.size_bytes}"/>
-
-                </h:panelGrid>
-
-                <p:separator/>
-
-                <p:commandButton value="Guardar"
-                                 icon="pi pi-check"
-                                 update="@form :global"
-                                 action="#{media_filesBean.guardar()}"/>
-
-                <p:commandButton value="Cancelar"
-                                 icon="pi pi-times"
-                                 styleClass="p-button-secondary ml-2"
-                                 onclick="PF('dlgFileWidget').hide()"/>
-
-            </p:dialog>
-
         </h:form>
-
     </ui:define>
 </ui:composition>

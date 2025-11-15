@@ -114,6 +114,20 @@ public class Media_titlesBean implements Serializable {
             return;
         }
 
+        // Validar que tenga al menos un poster o ficha técnica
+        boolean tienePoster = MTselected.getMediaFiles().stream()
+                .anyMatch(mf -> mf.getFile_type() == file_type.POSTER);
+        boolean tieneFicha = MTselected.getMediaFiles().stream()
+                .anyMatch(mf -> mf.getFile_type() == file_type.TECHNICAL_SHEET);
+
+        if (!(tienePoster || tieneFicha)) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Debe subir al menos un Poster o una Ficha Técnica", null));
+            FacesContext.getCurrentInstance().validationFailed();
+            return;
+        }
+
         boolean isNew = MTselected.getMedia_titles_id() == null;
         MTservice.guardar(MTselected);
 
@@ -128,6 +142,7 @@ public class Media_titlesBean implements Serializable {
         dialogVisible = false;
     }
 
+
     public void eliminar(Media_titles mt) {
         MTservice.eliminar(mt);
         FacesContext.getCurrentInstance().addMessage(null,
@@ -137,48 +152,68 @@ public class Media_titlesBean implements Serializable {
 
     /* --------- File upload / delete --------- */
     public void handleFileUpload(FileUploadEvent event) {
+        // Validar que el tipo de archivo (enum) esté seleccionado
+        if (uploadingFileType == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Debe seleccionar un tipo de archivo antes de subir", null));
+            return;
+        }
+
         UploadedFile uf = event.getFile();
-        if (uf == null || uf.getSize() == 0) return;
+        if (uf == null || uf.getSize() == 0) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "No se recibió ningún archivo", null));
+            return;
+        }
 
         String ct = uf.getContentType();
         long size = uf.getSize();
-        boolean isImage = "image/jpeg".equals(ct) || "image/png".equals(ct);
-        boolean isPdf = "application/pdf".equals(ct);
+        boolean isImage = "image/jpeg".equalsIgnoreCase(ct) || "image/png".equalsIgnoreCase(ct);
+        boolean isPdf = "application/pdf".equalsIgnoreCase(ct);
 
+        // Validar tipo permitido
         if (!(isImage || isPdf)) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Tipo no permitido", ct));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Tipo no permitido", ct));
             return;
         }
+
+        // Validar tamaños
         if (isImage && size > 2L * 1024 * 1024) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "La imagen supera 2 MB", uf.getFileName()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "La imagen supera 2 MB", uf.getFileName()));
             return;
         }
         if (isPdf && size > 5L * 1024 * 1024) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "El PDF supera 5 MB", uf.getFileName()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "El PDF supera 5 MB", uf.getFileName()));
             return;
         }
 
         try (InputStream in = uf.getInputStream()) {
+            // Subir al blob storage
             MediaFileDTO dto = azureBlobStorageService.uploadCatalogFile(
                     uploadingFileType,
                     MTselected.getTitle_name(),
                     uf.getFileName(),
-                    uf.getContentType(),
+                    ct,
                     in,
-                    uf.getSize(),
+                    size,
                     "ui",
                     Duration.ofMinutes(30),
-                    true                           // 9: openInline (mostrar en navegador)
+                    true // openInline
             );
 
-            // Construir tu entidad Media_files con los datos del DTO
+            // Construir entidad Media_files con datos del DTO
             Media_files mf = new Media_files();
             mf.setMedia_titles(MTselected);
             mf.setFile_type(dto.getFile_type());
-            mf.setBlob_url(dto.getBlob_url());     // usa blob_url del DTO
+            mf.setBlob_url(dto.getBlob_url());
             mf.setBlobName(dto.getBlobName());
             mf.setEtag(dto.getEtag());
             mf.setContent_type(dto.getContent_type());
@@ -189,19 +224,21 @@ public class Media_titlesBean implements Serializable {
                 mf.setUploaded_at(java.sql.Timestamp.valueOf(dto.getUploaded_at().toLocalDateTime()));
             }
 
+            // Asociar al título seleccionado
             MTselected.getMediaFiles().add(mf);
 
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage("Archivo cargado: " + uf.getFileName()));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Archivo cargado: " + uf.getFileName(), null));
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al subir archivo", ex.getMessage()));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Error al subir archivo", ex.getMessage()));
         }
-
-
 
         PrimeFaces.current().ajax().update("frmMediaTitle:mediaFilesTable", "frmMediaTitle:messages");
     }
+
 
     public void deleteMediaFile() {
         if (selectedFile == null) return;

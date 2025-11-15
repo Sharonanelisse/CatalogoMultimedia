@@ -1,8 +1,8 @@
 package com.smarroquin.catalogomultimedia.controllers;
 
-
 import com.smarroquin.catalogomultimedia.models.Media_files;
 import com.smarroquin.catalogomultimedia.services.Media_filesService;
+import com.smarroquin.catalogomultimedia.enums.file_type;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -37,6 +37,10 @@ public class Media_filesBean implements Serializable {
 
     public List<Media_files> getList(){ return service.media_files();}
 
+    public file_type[] getFileTypes() {
+        return file_type.values();
+    }
+
     public void nuevo() {
         clearFacesMessages();
         selected = new Media_files();
@@ -58,7 +62,7 @@ public class Media_filesBean implements Serializable {
                 String message = violation.getMessage();
                 String label = getFieldLabel(field);
 
-                FacesContext.getCurrentInstance().addMessage("frmMediaFile:frmMediaFile",
+                FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 label + ": " + message, null));
             }
@@ -66,7 +70,6 @@ public class Media_filesBean implements Serializable {
             FacesContext.getCurrentInstance().validationFailed();
             return;
         }
-
 
         service.guardar(selected);
         dialogVisible = false;
